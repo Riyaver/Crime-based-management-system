@@ -1,0 +1,192 @@
+
+
+create table crime_reporting
+(
+  report_id          number       primary key,
+  name               char(50)     default 'anonymous',
+  gender             char(6)      default null,
+  phone_no           number       default null,
+  address            varchar2(50) default null,
+  date_time_reported              timestamp
+)
+
+create table admin
+(
+  admin_id        number       primary key,
+  admin_report_id number       references crime_reporting(report_id), 
+  team_leader     char(40)     not null,  
+  team_assigned   char(50)     not null,
+  police_station  varchar2(70) not null,
+  court_assigned  char(50)
+)
+
+create table crime_information 
+(
+  crime_info_report_id number       references crime_reporting(report_id),
+  crime_info_id        number       primary key,
+  time_of_crime        timestamp, 
+  date_of_crime        date,
+  evidence             varchar2(50) default null,
+  street               varchar2(50) not null,
+  sector               varchar2(50) not null,
+  city                 char(50)     not null,
+  state                char(50)     not null
+)
+
+create table crime_type
+(
+  crime_type_id     number      references crime_information(crime_info_id),
+  crime_id          number      primary key,
+  crime_name        char(50)    not null,
+  description_crime varchar2(50)
+)
+
+create table criminal_information
+(
+  criminal_id             number       primary key, 
+  criminal_report_id      number       references crime_information(crime_info_id),
+  crime_commited_id       number       references crime_type(crime_id),
+  criminal_information_id number       references crime_information(crime_info_id),
+  criminal_name           char(50)     default 'not known',
+  criminal_age            number       default null,
+  criminal_gender         char(6),
+  criminal_address        varchar2(50) default 'not known',
+  criminal_photo           int          check (criminal_photo between 0 and 1),
+  criminal_appearance     varchar2(50)
+)
+
+
+
+create table victim_information
+(
+  victim_id                      number       references crime_information(crime_info_id),
+  victim_name                    char(20),
+  victim_age                     number,
+  victim_gender                  char(6),
+  victime_address                varchar2(20),
+  relation_of_reporter_to_victim char(20)     not null,
+  condition_of_victim            char(20)
+)
+
+create table location 
+(
+location_id number references crime_information(crime_info_id),
+house_no varchar2(10),
+street varchar2(20),
+sector varchar2(10),
+pincode number,
+city char(15),
+state char(20)
+)
+
+create table status_of_case
+(
+  status_id          int references crime_reporting(report_id),
+  evidence_collected int check (evidence_collected between 0 and 1),
+  criminal_detained  int check (criminal_detained between 0 and 1),
+  pending            int check (pending between 0 and 1)
+)
+
+QUERIES
+DDL and DML queries 
+
+select * from crime_reporting
+desc crime_reporting
+desc admin
+desc crime_information
+desc crime_type
+desc criminal_information
+desc victim_information
+desc status_of_case
+desc location
+
+DDL for crime_reporiting 
+  alter table crime_reporting modify  name default null
+DML and DDl queries for crime_information
+--deleting column date_of_crime
+  alter table crime_information drop column date_of_crime
+DDL query for location
+  drop table location
+DDl for criminal_information 
+  alter table criminal_information drop column criminal_information_id
+
+declare
+begin
+  --DML and DDL queries for table crime_reporting
+  insert into crime_reporting values (1,'Aswathi Jain', 'male', 9078456045, 'H.no.7, Faridabad, Harayana', '11-Aug-22 1.45.50');
+  insert into crime_reporting values (2,'Dinesh D Cruze',null, 7896451236, 'Flno 111, Gurugram, Harayana', '13-Aug-22 11.59.10');
+  insert into crime_reporting values (3,'Pooja Das', 'female', 8954671236, 'H.no.134, Noida, Uttar Pradesh', '13-Aug-22 12.04.22');
+  insert into crime_reporting values (4,'Lucky Misra', 'male', 9658741254, null,'14-Aug-22 09.15.19');
+  insert into crime_reporting values (7,'Avantika Tomar', 'female', 7412589632, 'Flno 565 sec 23 Gurugram, Harayana', '16-Aug-22 12.03.00');
+end
+
+declare
+begin
+  --DML queries for admin table
+  insert into admin values (1612, 1, 'Deeksha Chautani', 'Nikita Nagarkar, Samir Narang, Balakrishna Ahmed', 'Police Station Suraj Kund, Faridabad, Harayana', 'pending');
+  insert into admin values (4555, 2, 'Swati Shekhawat', 'Arya Nagarkar, Sudarshana Patel', 'Police Station Sushant Lok, Gurugram, Harayana', 'District And Sessions Court Gurugram');
+  insert into admin values (8755, 3, 'Abhay D Cruz', 'Nikita Nagarkar, Lochan Begum, Varsha Ahmad', 'Police Station Noida sector-18, Noida, Uttar Pradesh', null);
+  insert into admin values (9654, 4, 'Upasana Chaudhari', 'Pramod Jain, Narayanan Patil, Aradhana Patel', 'Police Station Suraj Kund, Faridabad, Harayana','District And Sessions Court Faridabad');
+  insert into admin values (7854, 7, 'Gobind Gadhavi', 'Rajkumari Nagarkar, Manish Das', 'Police Station Sushant Lok, Gurugram, Harayana','pending');
+end
+
+declare
+begin
+  --Queries for crime_information
+  insert into crime_information values (1, 111, '11-Aug-22 10.45.45', null, 'St. Neelam','21-D', 'Faridabad', 'Haryana');
+  insert into crime_information values (2, 222, '12-Aug-22 09.44.15', 'Screw driver', 'St. Gandhi Nagar','14', 'Gurugram', 'Harayana');
+  insert into crime_information values (3, 123, null, 'Broken window and fingerprints', 'Indra Gandhi road','46', 'Gurugram', 'Harayana');
+  insert into crime_information values (4, 233, '14-Aug-22 6.12.15', null, 'Bata Chowk','18-C', 'Faridabad', 'Haryana');
+  insert into crime_information values (7, 987, '13-Aug-22 12.00.00', 'Knife and footprints', 'Shivaji Maharaj road',3, 'Gurugram', 'Harayana');
+end
+
+declare
+begin
+  --DML queries for crime_type table
+  insert into crime_type values (111, 107, 'Chain snatching', 'Criminals were on a bike');
+  insert into crime_type values (222, 456, 'Burgulary', 'Burglary from shop');
+  insert into crime_type values (123, 754, 'Burgulary', 'Burgulary from house');
+  insert into crime_type values (233, 123, 'Online Fraud', 'Online fraud');
+  insert into crime_type values (987, 001, 'Attempt to murder', 'Criminal came through Swift desire car');
+end
+
+declare
+begin
+  --DML and DDL queries for criminal_information
+  insert into crime_reporting values (101, 111, 107, null, null, null, null, 1, 'Was wearing a helmet');
+  insert into crime_reporting values (102, 222, 456, 'Vimal Joshi', null, 'male', 'Gurugram, Haryana', 1, 'shoulder length hair and piercings on right ear');
+  insert into crime_reporting values (103, 123, 754, 'Manish Das', null, 'male', null, 0, null);
+  insert into crime_reporting values (104, 233, 123, 'Anushka Chauhan', 19, 'female', 'Sec-33, Faridabad, Haryana', 1, 'Black brown hair, short height, wears glasses');
+  insert into crime_reporting values (105, 987, 001, null, null, null, null, 0, 'Black overall clothes');
+end
+desc criminal_information
+
+
+declare 
+begin
+  --DML queriers for victim_information
+  insert into victim_information values (111, 'Pratima D Cruze', 45, 'female', 'Hno.7, Faridabad', 'Self', 'Stable');
+  insert into victim_information values (222, 'Baldev Anand', null, 'male', 'Fno.111, Gurugram', 'Self', 'Stable');
+  insert into victim_information values (123, 'Chandrakant Misra', 43, 'male', 'Hno.134, Noida', 'Son', 'Stable');
+  insert into victim_information values (233, 'Yukta Tomar', 19, 'female', 'Sec46, Faridabad', 'Brother', 'Stable');
+  insert into victim_information values (987, null, null, 'male', null, 'Not related', 'Crtical');
+end
+desc victim_information
+
+declare
+begin
+  --DML queries for status_of_case
+  insert into status_of_case values (1, 1, 1, 1); 
+  insert into status_of_case values (2, 1, 0, 1); 
+  insert into status_of_case values (3, 1, 0, 1); 
+  insert into status_of_case values (4, 1, 1, 0); 
+  insert into status_of_case values (7, 0, 0, 1); 
+end
+
+select * from crime_reporting 
+select * from admin
+select * from crime_information
+select * from crime_type
+select * from criminal_information
+select * from victim_information
+select * from status_of_case
