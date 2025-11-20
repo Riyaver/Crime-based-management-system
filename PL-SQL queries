@@ -1,0 +1,75 @@
+#PLSQL queries 
+
+#UPDATING VALUES TOGETHER USING PLSQL
+declare
+begin
+  update victim_information set victim_age=20 where victim_id=987;
+  update victim_information set victime_address='hno.90 Gurugram' where victim_id=987;
+  update victim_information set Victim_name='Shrustee' where victim_id=987;
+end
+
+#STANDALONE FUNCTION TO CHECK STATUS OF CASE
+
+create or replace function status (a in int, b in int, c in int) return number is z number;
+  begin
+    if c=1 then
+       if a=0 and b=0 then
+         z:=1; 
+       elsif a=0 and b=1 then
+         z:=2;
+       elsif a=1 and b=0 then
+         z:=3;
+       else
+         z:=4;
+       end if;
+    else 
+       z:=5;
+    end if;
+    return z;
+  end;
+  
+
+declare
+  id number :=:Enter_report_id;
+  evidenc_collect status_of_case.evidence_collected%type; 
+  prisoner_detain status_of_case.criminal_detained%type;
+  pend status_of_case.pending%type;
+  result number;
+begin
+  select evidence_collected, criminal_detained, pending into evidenc_collect, prisoner_detain, pend from status_of_case where status_id = id;
+  result := status(evidenc_collect, prisoner_detain, pend);
+  if result=1 then
+    dbms_output.put_line('The case is pending with 0 evidence and 0 prisoner captured');
+  elsif result=2 then
+    dbms_output.put_line('The case is pending with 0 evidence and 1 suspect captured');
+  elsif result=3 then
+    dbms_output.put_line('The case is pending with evidence and 0 prisoner captured');
+  else 
+    dbms_output.put_line('The case is closed with evidence and prisoner captured');
+  end if;
+end;
+
+--STANDALONE PROCEDURE FOR PHOTO AVAILABILITY AND APPEARANCE OF CRIMINAL
+
+
+create or replace procedure photo_availability(a in number, b in varchar2, c out char, d out varchar2) is
+begin 
+  if a=1 then
+    c:='Photo is available with appearance';
+    d:=b;
+  else
+    c:='Photo is not available';
+  end if;
+end
+
+
+declare
+  info criminal_information%rowtype;
+  ans1 char(50);
+  ans2 varchar2(80);
+begin
+  select * into info from criminal_information where criminal_report_id=987;
+  --Checking availability of photograph of criminal 
+  photo_availability(info.criminal_photo, info.criminal_appearance, ans1, ans2);
+  dbms_output.put_line (ans1||ans2);
+end
